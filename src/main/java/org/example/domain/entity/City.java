@@ -1,12 +1,11 @@
 package org.example.domain.entity;
 
-import lombok.Data;
 
 import javax.persistence.*;
 
 
 @Entity
-@Table(name = "city", schema = "world")
+@Table(schema = "world", name = "city")
 public class City {
 
     @Id

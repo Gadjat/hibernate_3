@@ -8,13 +8,17 @@ import org.example.domain.repository.CityDAO;
 import org.example.domain.repository.CountryDAO;
 import org.example.domain.repository.CountryLanguageDAO;
 import org.example.domain.util.ConnectionFactory;
+import org.hibernate.Session;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.util.Objects.nonNull;
 
 public class Main {
 
     private final ConnectionFactory connectionFactory;
-    private final RedisClient redisClient;
+    //private final RedisClient redisClient;
 
     private final ObjectMapper mapper;
 
@@ -26,7 +30,7 @@ public class Main {
 
     public Main(){
         connectionFactory = new ConnectionFactory();
-        redisClient = prepareRedisClient();
+        //redisClient = prepareRedisClient();
         cityDAO = new CityDAO(City.class, connectionFactory);
         countryDAO = new CountryDAO(Country.class, connectionFactory);
         countryLanguageDAO = new CountryLanguageDAO(CountryLanguageDAO.class, connectionFactory);
@@ -37,11 +41,30 @@ public class Main {
         if (nonNull(connectionFactory)) {
             connectionFactory.close();
         }
-        if (nonNull(redisClient)) {
-            redisClient.shutdown();
-        }
+//        if (nonNull(redisClient)) {
+//            redisClient.shutdown();
+//        }
     }
 
+    private List<City> fetchData(Main main) {
+        try (Session session = main.connectionFactory.open()) {
+            List<City> allCities = new ArrayList<>();
+            session.beginTransaction();
+
+            int totalCount = main.cityDAO.getTotalCount();
+            int step = 500;
+            for (int i = 0; i < totalCount; i += step) {
+                allCities.addAll(main.cityDAO.getItems(i, step));
+            }
+            session.getTransaction().commit();
+            return allCities;
+        }
+    }
+    public static void main(String[] args) throws Exception {
+        Main main = new Main();
+        List<City> allCities = main.fetchData(main);
+        main.shutdown();
+    }
 
 
 }

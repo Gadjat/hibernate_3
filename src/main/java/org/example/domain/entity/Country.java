@@ -1,6 +1,5 @@
 package org.example.domain.entity;
 
-import lombok.Data;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -8,10 +7,10 @@ import java.util.Set;
 
 
 @Entity
-@Table(name = "country", schema = "world")
+@Table(schema = "world", name = "country")
 public class Country {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
     @Column(length = 3)

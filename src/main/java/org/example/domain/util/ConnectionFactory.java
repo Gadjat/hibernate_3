@@ -1,6 +1,6 @@
 package org.example.domain.util;
 
-import lombok.SneakyThrows;
+
 import org.example.domain.entity.City;
 import org.example.domain.entity.Country;
 import org.example.domain.entity.CountryLanguage;
@@ -10,7 +10,7 @@ import org.hibernate.cfg.Configuration;
 
 public class ConnectionFactory implements AutoCloseable{
     private final SessionFactory sessionFactory;
-    @SneakyThrows
+
     public ConnectionFactory(){
         Configuration configuration = new Configuration();
         configuration.addAnnotatedClass(City.class);
@@ -19,16 +19,13 @@ public class ConnectionFactory implements AutoCloseable{
         sessionFactory = configuration.buildSessionFactory();
     }
 
-    @SneakyThrows
-    public Session open()  {
-        try(ConnectionFactory creator = new ConnectionFactory()){
-            return creator.sessionFactory.openSession();
-        }
 
+    public Session open()  {
+        return sessionFactory.openSession();
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         sessionFactory.close();
     }
 }

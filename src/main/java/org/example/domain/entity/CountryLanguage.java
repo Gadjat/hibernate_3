@@ -1,6 +1,5 @@
 package org.example.domain.entity;
 
-import lombok.Data;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -8,10 +7,11 @@ import java.math.BigDecimal;
 
 
 @Entity
-@Table(name = "country_language", schema = "world")
+@Table(schema = "world", name = "country_language")
 public class CountryLanguage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Integer id;
 
     @ManyToOne
