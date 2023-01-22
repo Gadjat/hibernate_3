@@ -2,7 +2,7 @@ package org.example.domain.entity;
 
 import org.hibernate.annotations.Type;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 

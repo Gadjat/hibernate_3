@@ -1,11 +1,11 @@
 package org.example.domain.repository;
 
 import org.example.domain.entity.CountryLanguage;
-import org.example.domain.util.ConnectionFactory;
+import org.hibernate.SessionFactory;
 
 public class CountryLanguageDAO extends AbstractDAO<CountryLanguage>{
 
-    public CountryLanguageDAO(Class<CountryLanguage> clazzToSet, ConnectionFactory connectionFactory) {
-        super(clazzToSet, connectionFactory);
+    public CountryLanguageDAO(Class<CountryLanguage> clazzToSet, SessionFactory sessionFactory) {
+        super(clazzToSet, sessionFactory);
     }
 }

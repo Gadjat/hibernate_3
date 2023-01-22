@@ -1,72 +1,35 @@
 package org.example.domain.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.lettuce.core.RedisClient;
 import org.example.domain.entity.City;
-import org.example.domain.entity.Country;
-import org.example.domain.entity.CountryLanguage;
-import org.example.domain.repository.CityDAO;
-import org.example.domain.repository.CountryDAO;
-import org.example.domain.repository.CountryLanguageDAO;
-import org.example.domain.util.ConnectionFactory;
-import org.hibernate.Session;
-
-import java.util.ArrayList;
+import org.example.domain.redis.CityCountry;
 import java.util.List;
-
-import static java.util.Objects.nonNull;
 
 public class Main {
 
-    private final ConnectionFactory connectionFactory;
-    //private final RedisClient redisClient;
 
-    private final ObjectMapper mapper;
-
-    private final CityDAO cityDAO;
-    private final CountryDAO countryDAO;
-
-    private final CountryLanguageDAO countryLanguageDAO;
-
-
-    public Main(){
-        connectionFactory = new ConnectionFactory();
-        //redisClient = prepareRedisClient();
-        cityDAO = new CityDAO(City.class, connectionFactory);
-        countryDAO = new CountryDAO(Country.class, connectionFactory);
-        countryLanguageDAO = new CountryLanguageDAO(CountryLanguage.class, connectionFactory);
-        mapper = new ObjectMapper();
-    }
-
-    private void shutdown() throws Exception {
-        if (nonNull(connectionFactory)) {
-            connectionFactory.close();
-        }
-//        if (nonNull(redisClient)) {
-//            redisClient.shutdown();
-//        }
-    }
-
-    private List<City> fetchData(Main main) {
-        try (Session session = main.connectionFactory.open()) {
-            List<City> allCities = new ArrayList<>();
-            session.beginTransaction();
-
-            List<Country> countries = main.countryDAO.getAll();
-
-            int totalCount = main.cityDAO.getTotalCount();
-            int step = 500;
-            for (int i = 0; i < totalCount; i += step) {
-                allCities.addAll(main.cityDAO.getItems(i, step));
-            }
-            session.getTransaction().commit();
-            return allCities;
-        }
-    }
     public static void main(String[] args) throws Exception {
-        Main main = new Main();
-        List<City> allCities = main.fetchData(main);
-        main.shutdown();
+        RedisVsMySqlService redisVsMySqlService = new RedisVsMySqlService();
+
+        List<City> allCities = redisVsMySqlService.fetchData(redisVsMySqlService);
+        List<CityCountry> preparedData = redisVsMySqlService.transformData(allCities);
+        redisVsMySqlService.getRedisConnectionFactory().pushToRedis(preparedData);
+
+        redisVsMySqlService.getSessionFactory().getCurrentSession().close();
+
+        List<Integer> ids = List.of(3, 2545, 123, 4, 189, 89, 3458, 1189, 10, 102);
+
+        long startRedis = System.currentTimeMillis();
+        redisVsMySqlService.getRedisConnectionFactory().testRedisData(ids);
+        long stopRedis = System.currentTimeMillis();
+
+        long startMysql = System.currentTimeMillis();
+        redisVsMySqlService.getCityDAO().testMysqlData(ids);
+        long stopMysql = System.currentTimeMillis();
+
+        System.out.printf("%s:\t%d ms\n", "Redis", (stopRedis - startRedis));
+        System.out.printf("%s:\t%d ms\n", "MySQL", (stopMysql - startMysql));
+
+        redisVsMySqlService.shutdown();
     }
 
 

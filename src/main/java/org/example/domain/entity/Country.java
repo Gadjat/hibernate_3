@@ -1,7 +1,7 @@
 package org.example.domain.entity;
 
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.Set;
 
@@ -47,7 +47,7 @@ public class Country {
     @Column(name = "head_of_state")
     private String headOfState;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "capital")
     private City city;
 
