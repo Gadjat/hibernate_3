@@ -26,6 +26,11 @@ public abstract class AbstractDAO<T> {
         return query.getResultList();
     }
 
+    public List<T> getAll() {
+        Query<T> query = getCurrentSession().createQuery("select c from " + clazz.getName()+ " c ", clazz);
+        return query.list();
+    }
+
     public List<T> findAll() {
         return getCurrentSession().createQuery("from " + clazz.getName(), clazz).list();
     }

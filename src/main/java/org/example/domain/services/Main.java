@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.lettuce.core.RedisClient;
 import org.example.domain.entity.City;
 import org.example.domain.entity.Country;
+import org.example.domain.entity.CountryLanguage;
 import org.example.domain.repository.CityDAO;
 import org.example.domain.repository.CountryDAO;
 import org.example.domain.repository.CountryLanguageDAO;
@@ -33,7 +34,7 @@ public class Main {
         //redisClient = prepareRedisClient();
         cityDAO = new CityDAO(City.class, connectionFactory);
         countryDAO = new CountryDAO(Country.class, connectionFactory);
-        countryLanguageDAO = new CountryLanguageDAO(CountryLanguageDAO.class, connectionFactory);
+        countryLanguageDAO = new CountryLanguageDAO(CountryLanguage.class, connectionFactory);
         mapper = new ObjectMapper();
     }
 
@@ -50,6 +51,8 @@ public class Main {
         try (Session session = main.connectionFactory.open()) {
             List<City> allCities = new ArrayList<>();
             session.beginTransaction();
+
+            List<Country> countries = main.countryDAO.getAll();
 
             int totalCount = main.cityDAO.getTotalCount();
             int step = 500;
